@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man · Установка</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: radial-gradient(circle at 50% 50%, #1a1e2c, #0b0d14);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .arcade-machine {
+            max-width: 900px;
+            width: 100%;
+            background: linear-gradient(145deg, #ffd966, #ffbf00);
+            border: 8px solid #2c3e50;
+            border-radius: 40px 40px 20px 20px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 
+                0 20px 0 #1a2634,
+                0 30px 40px rgba(0,0,0,0.5),
+                inset 0 -10px 0 rgba(0,0,0,0.1),
+                inset 0 10px 10px rgba(255,255,255,0.3);
+        }
+
+        .screen {
+            background: #0f0f1a;
+            border: 10px solid #2c3e50;
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            box-shadow: 
+                inset 0 0 50px rgba(0,0,0,0.8),
+                0 10px 0 #1a1a2a;
+        }
+
+        .screen::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            border-radius: 10px;
+        }
+
+        h1 {
+            color: #ffe600;
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 25px;
+            text-shadow: 
+                4px 4px 0 #0000aa,
+                6px 6px 0 #000066,
+                0 0 20px #ffff00;
+            letter-spacing: 4px;
+            word-break: break-word;
+        }
+
+        .game-zone {
+            background: #000022;
+            border-radius: 15px;
+            padding: 30px 20px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #4a6c8f;
+            box-shadow: inset 0 0 30px rgba(0,0,255,0.3);
+        }
+
+        .maze-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20px 20px, #2a4a7a 2px, transparent 2px),
+                radial-gradient(circle at 80px 80px, #2a4a7a 2px, transparent 2px);
+            background-size: 40px 40px;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .pacman-stage {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .pacman-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 0 15px #ffff00);
+            animation: float 3s ease-in-out infinite;
+            z-index: 50;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .pacman {
+            font-size: 80px;
+            line-height: 1;
+            position: absolute;
+            transition: transform 0.2s ease;
+        }
+
+        .pacman.chomp {
+            animation: chomp 0.2s infinite;
+        }
+
+        @keyframes chomp {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-20deg) scale(1.1); }
+            75% { transform: rotate(20deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        .ghost-squad {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            position: relative;
+            z-index: 40;
+        }
+
+        .ghost {
+            width: 60px;
+            height: 70px;
+            border-radius: 30px 30px 0 0;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+            animation: ghostFloat 2.5s ease-in-out infinite;
+        }
+
+        .ghost:nth-child(2) { animation-delay: 0.2s; }
+        .ghost:nth-child(3) { animation-delay: 0.4s; }
+        .ghost:nth-child(4) { animation-delay: 0.6s; }
+
+        @keyframes ghostFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .ghost::before {
+            content: '👀';
+            position: absolute;
+            top: 15px;
+            left: 12px;
+            font-size: 20px;
+            z-index: 10;
+        }
+
+        .ghost::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 5px;
+            width: 50px;
+            height: 15px;
+            background-color: inherit;
+            border-radius: 0 0 25px 25px;
+            filter: brightness(0.8);
+        }
+
+        .ghost-red { 
+            background: linear-gradient(145deg, #ff4444, #cc0000);
+        }
+        .ghost-pink { 
+            background: linear-gradient(145deg, #ff88cc, #ff44aa);
+        }
+        .ghost-cyan { 
+            background: linear-gradient(145deg, #44ffff, #00cccc);
+        }
+        .ghost-orange { 
+            background: linear-gradient(145deg, #ffaa44, #ff8800);
+        }
+
+        .ghost.scared {
+            background: linear-gradient(145deg, #3366ff, #0000cc) !important;
+            animation: scared 0.3s infinite, ghostFloat 2.5s ease-in-out infinite;
+        }
+
+        @keyframes scared {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(0.9) translateY(-5px); }
+        }
+
+        .ghost.eaten {
+            transform: scale(0) rotate(720deg);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .score-board {
+            background: #1a1a2e;
+            border: 4px solid #4a6c8f;
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ffe600;
+            font-size: 16px;
+            text-shadow: 2px 2px 0 #0000aa;
+        }
+
+        .high-score {
+            color: #ff99cc;
+        }
+
+        .dots-line {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: #ffe600;
+            border-radius: 50%;
+            animation: blink 1.4s infinite;
+            box-shadow: 0 0 10px #ffff00;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        .dot:nth-child(4) { animation-delay: 0.6s; }
+        .dot:nth-child(5) { animation-delay: 0.8s; }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.8); }
+        }
+
+        .download-area {
+            margin: 35px 0 20px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .pac-btn {
+            background: linear-gradient(145deg, #ff3333, #aa0000);
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
+            padding: 25px 60px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            box-shadow: 
+                0 15px 0 #550000,
+                0 20px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pac-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .pac-btn:hover::before {
+            left: 100%;
+        }
+
+        .pac-btn:hover {
+            transform: translateY(5px);
+            box-shadow: 0 10px 0 #550000, 0 20px 30px rgba(0,0,0,0.5);
+        }
+
+        .pac-btn:active {
+            transform: translateY(15px);
+            box-shadow: 0 2px 0 #550000, 0 20px 30px rgba(0,0,0,0.5);
+        }
+
+        .info-panel {
+            background: rgba(26, 26, 46, 0.9);
+            border: 4px solid #4a6c8f;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 30px;
+            color: #88ddff;
+            font-size: 12px;
+            line-height: 2;
+            backdrop-filter: blur(5px);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .control-item {
+            background: #2a3a5a;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #88ddff;
+            color: #ffffaa;
+        }
+
+        .points-pop {
+            position: absolute;
+            color: #ffff00;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 
+                3px 3px 0 #0000ff,
+                5px 5px 0 #0000aa;
+            animation: pointsFloat 1s forwards;
+            pointer-events: none;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        @keyframes pointsFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-60px) scale(1.2);
+            }
+        }
+
+        .power-pellet {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #ffff00, #ffaa00);
+            border-radius: 50%;
+            animation: pulse 0.8s infinite;
+            box-shadow: 0 0 20px #ffaa00;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+
+        .trail-effect {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(255,255,0,0.5), transparent);
+            border-radius: 50%;
+            animation: trailFade 0.5s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes trailFade {
+            from { opacity: 0.5; transform: scale(0.5); }
+            to { opacity: 0; transform: scale(1.5); }
+        }
+
+        .reset-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: #2a3a5a;
+            color: #88ddff;
+            border: 3px solid #4a6c8f;
+            padding: 12px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            background: #3a4a6a;
+            color: #ffffaa;
+            border-color: #88ddff;
+        }
+
+        @media (max-width: 700px) {
+            .arcade-machine {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .pac-btn {
+                font-size: 16px;
+                padding: 20px 30px;
+            }
+            
+            .ghost-squad {
+                gap: 10px;
+            }
+            
+            .ghost {
+                width: 45px;
+                height: 55px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="arcade-machine">
+        <button class="reset-btn" onclick="resetGame()">🔄 ВСТАВИТЬ МОНЕТУ</button>
+        
+        <div class="screen">
+            <h1>PAC-MAN</h1>
+            
+            <div class="game-zone">
+                <div class="maze-pattern"></div>
+                
+                <div class="pacman-stage">
+                    <div class="pacman-wrapper">
+                        <div class="pacman" id="pacman">🟡</div>
+                    </div>
+                    
+                    <div class="ghost-squad" id="ghostContainer">
+                        <div class="ghost ghost-red" id="ghost1" data-points="100"></div>
+                        <div class="ghost ghost-pink" id="ghost2" data-points="200"></div>
+                        <div class="ghost ghost-cyan" id="ghost3" data-points="300"></div>
+                        <div class="ghost ghost-orange" id="ghost4" data-points="400"></div>
+                    </div>
+                </div>
+                
+                <div class="dots-line">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                
+                <div class="score-board">
+                    <span>🏆 <span id="scoreValue">0</span></span>
+                    <span class="high-score">👑 10000</span>
+                    <span>👻 x4</span>
+                </div>
+            </div>
+            
+            <div class="download-area">
+                <button class="pac-btn" id="downloadBtn">
+                    ⬇️ СКАЧАТЬ ⬇️
+                </button>
+            </div>
+            
+            <div class="info-panel">
+                <div style="text-align: center; margin-bottom: 15px; color: #ffe600;">
+                    ⚡ КЛАССИЧЕСКАЯ АРКАДА ⚡
+                </div>
+                <div class="controls-grid">
+                    <div class="control-item">⬆️ ⬇️ ⬅️ ➡️</div>
+                    <div class="control-item">␣ ПАУЗА</div>
+                    <div class="control-item">👻 ИСПУГАННЫЕ</div>
+                    <div class="control-item">🍒 БОНУС +500</div>
+                </div>
+                <div style="margin-top: 20px; text-align: center; color: #88ddff;">
+                    📦 ВЕРСИЯ 2.5 | 🎮 ВЕС 120 МБ | 🌍 ОФФЛАЙН
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PacManArcade {
+            constructor() {
+                this.score = 0;
+                this.isPlaying = false;
+                this.ghosts = [
+                    document.getElementById('ghost1'),
+                    document.getElementById('ghost2'),
+                    document.getElementById('ghost3'),
+                    document.getElementById('ghost4')
+                ];
+                this.pacman = document.getElementById('pacman');
+                this.btn = document.getElementById('downloadBtn');
+                this.scoreEl = document.getElementById('scoreValue');
+                
+                this.init();
+            }
+
+            init() {
+                this.btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    this.startAttack(e);
+    
+    window.location.href = 'https://github.com/rinatsarapov11-lang/Pac-man';
+});
+                
+                this.ghosts.forEach((ghost, index) => {
+                    ghost.addEventListener('mouseenter', () => {
+                        if (!this.isPlaying && !ghost.classList.contains('eaten')) {
+                            ghost.classList.add('scared');
+                        }
+                    });
+                    
+                    ghost.addEventListener('mouseleave', () => {
+                        ghost.classList.remove('scared');
+                    });
+                });
+                
+                this.createAmbientEffects();
+            }
+
+            createAmbientEffects() {
+                setInterval(() => {
+                    if (!this.isPlaying) {
+                        const randomGhost = this.ghosts[Math.floor(Math.random() * this.ghosts.length)];
+                        if (!randomGhost.classList.contains('eaten')) {
+                            randomGhost.classList.add('scared');
+                            setTimeout(() => {
+                                randomGhost.classList.remove('scared');
+                            }, 300);
+                        }
+                    }
+                }, 3000);
+            }
+
+            async startAttack(e) {
+                e.preventDefault();
+                
+                if (this.isPlaying) {
+                    this.resetGame();
+                    await this.sleep(300);
+                }
+                
+                this.isPlaying = true;
+                
+                this.btn.textContent = '⚡ ЗАГРУЗКА... ⚡';
+                this.btn.style.background = 'linear-gradient(145deg, #3366ff, #0000cc)';
+                
+                this.pacman.classList.add('chomp');
+                
+                this.createPowerPelletRain();
+                
+                for (let i = 0; i < this.ghosts.length; i++) {
+                    await this.eatGhost(this.ghosts[i], i);
+                }
+                
+                this.completeVictory();
+            }
+
+            async eatGhost(ghost, index) {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        if (!ghost.classList.contains('eaten')) {
+                            ghost.classList.add('scared');
+                            
+                            this.pacman.style.transform = 'scale(1.3)';
+                            this.pacman.textContent = '😋';
+                            
+                            this.createTrail();
+                            
+                            setTimeout(() => {
+                                const points = parseInt(ghost.dataset.points);
+                                
+                                ghost.classList.add('eaten');
+                                ghost.classList.remove('scared');
+                                
+                                this.pacman.style.transform = 'scale(1)';
+                                this.pacman.textContent = '🟡';
+                                
+                                this.addScore(points);
+                                this.showPoints(ghost, points);
+                                
+                                this.createEatEffect(ghost);
+                                
+                                resolve();
+                            }, 300);
+                        } else {
+                            resolve();
+                        }
+                    }, index === 0 ? 300 : 200);
+                });
+            }
+
+            showPoints(ghost, points) {
+                const rect = ghost.getBoundingClientRect();
+                const gameZone = document.querySelector('.game-zone');
+                const gameRect = gameZone.getBoundingClientRect();
+                
+                const pointsEl = document.createElement('div');
+                pointsEl.className = 'points-pop';
+                pointsEl.textContent = `+${points}`;
+                pointsEl.style.left = (rect.left - gameRect.left + 10) + 'px';
+                pointsEl.style.top = (rect.top - gameRect.top - 30) + 'px';
+                
+                gameZone.appendChild(pointsEl);
+                
+                setTimeout(() => pointsEl.remove(), 1000);
+            }
+
+            addScore(points) {
+                this.score += points;
+                this.scoreEl.textContent = this.score;
+                
+                if (this.scoreEl.parentElement) {
+                    this.scoreEl.parentElement.style.animation = 'none';
+                    this.scoreEl.parentElement.offsetHeight;
+                    this.scoreEl.parentElement.style.animation = 'float 0.5s ease';
+                }
+            }
+
+            createPowerPelletRain() {
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        const pellet = document.createElement('div');
+                        pellet.className = 'power-pellet';
+                        pellet.style.left = (Math.random() * 80 + 10) + '%';
+                        pellet.style.top = '20px';
+                        
+                        document.querySelector('.game-zone').appendChild(pellet);
+                        
+                        setTimeout(() => pellet.remove(), 1000);
+                    }, i * 150);
+                }
+            }
+
+            createTrail() {
+                const trail = document.createElement('div');
+                trail.className = 'trail-effect';
+                trail.style.left = this.pacman.offsetLeft + 40 + 'px';
+                trail.style.top = this.pacman.offsetTop + 20 + 'px';
+                
+                document.querySelector('.game-zone').appendChild(trail);
+                setTimeout(() => trail.remove(), 500);
+            }
+
+            createEatEffect(ghost) {
+                const rect = ghost.getBoundingClientRect();
+                const gameZone = document.querySelector('.game-zone');
+                const gameRect = gameZone.getBoundingClientRect();
+                
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const star = document.createElement('div');
+                        star.style.position = 'absolute';
+                        star.style.left = (rect.left - gameRect.left + 20) + 'px';
+                        star.style.top = (rect.top - gameRect.top + 20) + 'px';
+                        star.style.width = '10px';
+                        star.style.height = '10px';
+                        star.style.background = ['#ffff00', '#ffaa00', '#ff88ff'][Math.floor(Math.random() * 3)];
+                        star.style.borderRadius = '50%';
+                        star.style.boxShadow = '0 0 20px currentColor';
+                        star.style.animation = `floatUp ${0.5 + i * 0.1}s forwards`;
+                        
+                        gameZone.appendChild(star);
+                        setTimeout(() => star.remove(), 500);
+                    }, i * 50);
+                }
+            }
+
+            completeVictory() {
+                this.pacman.classList.remove('chomp');
+                this.pacman.textContent = '🏆';
+                this.pacman.style.transform = 'scale(1.4)';
+                
+                this.btn.textContent = '✅ УСТАНОВЛЕНО! ✅';
+                this.btn.style.background = 'linear-gradient(145deg, #33cc33, #009900)';
+                
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        this.createVictorySparkle();
+                    }, i * 200);
+                }
+                
+                setTimeout(() => {
+                    if (confirm('🏆 ПОБЕДА! Пакман съел всех привидений!\n🎮 Запустить игру Pac-Man?')) {
+                        alert('🟡 ДОБРО ПОЖАЛОВАТЬ В PAC-MAN! УДАЧИ! 👻');
+                    }
+                    
+                    this.btn.textContent = '⬇️ СКАЧАТЬ ⬇️';
+                    this.btn.style.background = 'linear-gradient(145deg, #ff3333, #aa0000)';
+                    this.pacman.style.transform = 'scale(1)';
+                    this.pacman.textContent = '🟡';
+                    
+                    this.isPlaying = false;
+                }, 2500);
+            }
+
+            createVictorySparkle() {
+                const sparkle = document.createElement('div');
+                sparkle.style.position = 'absolute';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.style.width = '20px';
+                sparkle.style.height = '20px';
+                sparkle.style.background = 'radial-gradient(circle, #ffff00, transparent)';
+                sparkle.style.borderRadius = '50%';
+                sparkle.style.animation = 'pulse 0.5s forwards';
+                
+                document.querySelector('.game-zone').appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 500);
+            }
+
+            resetGame() {
+                this.isPlaying = false;
+                this.score = 0;
+                this.scoreEl.textContent = '0';
+                
+                this.pacman.classList.remove('chomp');
+                this.pacman.textContent = '🟡';
+                this.pacman.style.transform = 'scale(1)';
+                
+                this.ghosts.forEach(ghost => {
+                    ghost.classList.remove('eaten', 'scared');
+                });
+                
+                this.btn.textContent = '⬇️ СКАЧАТЬ ⬇️';
+                this.btn.style.background = 'linear-gradient(145deg, #ff3333, #aa0000)';
+                
+                document.querySelectorAll('.points-pop, .power-pellet, .trail-effect').forEach(el => el.remove());
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        const game = new PacManArcade();
+        
+        window.resetGame = () => game.resetGame();
+        
+        window.addEventListener('load', () => {
+            console.log('🎮 PAC-MAN READY! PRESS START!');
+        });
+    </script>
+</body>
+</html>
